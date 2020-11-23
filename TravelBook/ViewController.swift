@@ -16,7 +16,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     @IBOutlet weak var commentText: UITextField!
     
     @IBOutlet weak var mapView: MKMapView!
-    var locationManageer = CLLocationManager()
+    var locationManager = CLLocationManager()
     var chosenLatitude = Double()
     var chosenLongitude = Double()
     
@@ -32,10 +32,10 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
         super.viewDidLoad()
         
         mapView.delegate = self
-        locationManageer.delegate = self
-        locationManageer.desiredAccuracy = kCLLocationAccuracyBest
-        locationManageer.requestWhenInUseAuthorization()
-        locationManageer.startUpdatingLocation()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
         
         let gestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(chooseLocation(gestureRecognizer:)))
         gestureRecognizer.minimumPressDuration = 3
@@ -80,6 +80,12 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
                                         nameText.text = annotaionTitle
                                         commentText.text = annotationSubtitle
                                         
+                                        locationManager.stopUpdatingLocation()
+                                        
+                                        let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                                        let region = MKCoordinateRegion(center: coordinate, span: span)
+                                        mapView.setRegion(region, animated: true)
+                                        
                                     }
                                 }
                             }
@@ -117,10 +123,14 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if selectedTitle == "" {
         let location = CLLocationCoordinate2D(latitude: locations[0].coordinate.latitude, longitude: locations[0].coordinate.longitude)
         let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
         let region = MKCoordinateRegion(center: location, span: span)
         mapView.setRegion(region, animated: true)
+        } else {
+            //
+        }
     }
     
     
